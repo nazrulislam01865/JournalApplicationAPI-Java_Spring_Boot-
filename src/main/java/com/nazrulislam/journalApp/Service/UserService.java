@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import com.nazrulislam.journalApp.Repository.UserRepository;
@@ -15,7 +17,16 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     public boolean create(User entry){
+        entry.setPassword(passwordEncoder.encode(entry.getPassword()));
+        entry.setRoles(List.of("USER")); // Assign default role
+        userRepository.save(entry);
+        return true;
+    }
+
+    public boolean Newcreate(User entry){
         userRepository.save(entry);
         return true;
     }
@@ -33,7 +44,7 @@ public class UserService {
     }
     
     public User findByUserName(String userName){
-        return userRepository.findByUserName(userName);
+        return (User) userRepository.findByUserName(userName);
     }
 
 }
